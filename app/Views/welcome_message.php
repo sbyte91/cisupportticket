@@ -253,7 +253,7 @@
                 if (auth()->user()) {
                 ?>
                     <!-- <li class="menu-item hidden"><a href="dashboard">View Dashboard</a></li> -->
-                    <li class="menu-item hidden"><a href="dashboard">View Dashboard</a></li>
+                    <li class="menu-item hidden"><a href="dashboard">Support Ticket</a></li>
                     <li class="menu-item hidden"><a href="logout">Logout</a></li>
                 <?php
                 } else {

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\Office;
+use App\Models\Profile;
 use App\Models\SupportCondition;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketResponse;
@@ -81,7 +82,7 @@ class TicketController extends BaseController
         $data = array();
 
         foreach ($records as $record) {
-            $user_id = auth()->user()->id;
+            $user_id = $record['requested_by'];
             $user_model = new Users();
             $status = new TicketStatus();
             $condition = new SupportCondition();
@@ -90,10 +91,14 @@ class TicketController extends BaseController
             $of = $office->select('office_name')->where('office_id', $record['office_id'])->findAll();
             $con = $condition->select('condition')->where('support_condition_id', $record['support_condition_id'])->findAll();
             $stat = $status->select('ticket_status')->where('ticket_status_id', $record['ticket_status_id'])->findAll();
+            $profile_model = new Profile();
+            $profile = $profile_model->select('first_name,last_name')->where('user_id', $user_id)->findAll();
+
             $data[] = array(
                 "support_ticket_id" => $record['support_ticket_id'],
                 "ticket_num" => $record['ticket_num'],
-                "name" => $prof[0]['username'],
+                //"name" => $prof[0]['username'],
+                "name" => $profile[0]['first_name'].' '.$profile[0]['last_name'],
                 "email" => $prof[0]['secret'],
                 "office_id" => $record['office_id'],
                 "office" => $of[0]['office_name'],

@@ -16,7 +16,8 @@ $routes->get('dashboard', 'DashboardController::index',['filter' => 'auth']);
 //$routes->get('tickets', 'TicketController::index',['filter' => 'auth']);
 //$routes->get('responses', 'ResponseController::index',['filter' => 'auth']);
 
-$routes->post('authors/list', 'AuthorController::list', ['filter' => 'groupfilter:admin']);
+//$routes->post('authors/list', 'AuthorController::list', ['filter' => 'groupfilter:admin']);
+$routes->get('profiles/list', 'ProfileController::list', ['filter' => 'groupfilter:admin']);
 $routes->get('office/list', 'OfficeController::list', ['filter' => 'groupfilter:admin']);
 $routes->get('status/list', 'StatusController::list', ['filter' => 'groupfilter:admin']);
 $routes->get('condition/list', 'ConditionController::list', ['filter' => 'groupfilter:admin']);

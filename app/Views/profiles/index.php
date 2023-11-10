@@ -5,7 +5,7 @@
     <div class="container-fulid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">Author Management</h1>
+                <h1 class="m-0">Profile Management</h1>
             </div>
         </div>
     </div>
@@ -16,18 +16,21 @@
         <div class="row mb-2">
             <div class="col-sm-12">
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalID">
-                    Add Author
+                    Add User Profile
                 </button>
             </div>
         </div>
         <table id="dataTable" class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th hidden>ID</th>
+                    <th>USER NAME</th>
                     <th>LAST NAME</th>
                     <th>FIRST NAME</th>
+                    <th>MIDDLE NAME</th>
                     <th>EMAIL</th>
                     <th>BIRTH DATE</th>
+                    <th>GENDER</th>
                     <th>ACTION</th>
                 </tr>
             </thead>
@@ -47,11 +50,30 @@
                         <form class="needs-validation" novalidate>
                             <div class="card-body">
                                 <input type="hidden" name="id" id="id">
+                                <label class="badge-danger"> Make sure user is already registered before creating profile.</label>
+                                <div class="form-group">
+                                    <label>User</label>
+                                    <select name="user_id" id="user_id" class="form-control select2" style="width: 100%;" required>
+                                        <option value="">Select User</option>
+                                        <?php foreach($users as $user) {
+                                            echo "<option value='".$user['id']."'>".$user['username']."</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                    <div class="valid-feedback">Looks Good!</div>
+                                    <div class="invalid-feedback">Please select User.</div>
+                                </div>
                                 <div class="form-group">
                                     <label for="first_name">First Name</label>
                                     <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name" required>
                                     <div class="valid-feedback">Looks Good!</div>
                                     <div class="invalid-feedback">Please provide a valid First Name.</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last_name">Middle Name</label>
+                                    <input type="text" class="form-control" name="middle_name" id="middle_name" placeholder="Enter Middle Name">
+                                    <div class="valid-feedback">Looks Good!</div>
+                                    <div class="invalid-feedback">Please provide a valid Middle Name.</div>
                                 </div>
                                 <div class="form-group">
                                     <label for="last_name">Last Name</label>
@@ -60,19 +82,23 @@
                                     <div class="invalid-feedback">Please provide a valid Last Name.</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="email">Email</label>
-                                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter Last Name" required>
-                                    <div class="valid-feedback">Looks Good!</div>
-                                    <div class="invalid-feedback">Please provide a valid Email Name.</div>
-                                </div>
-                                <div class="form-group">
                                     <label for="birthdate">Birth Date</label>
                                     <div class="input-group date" id="birthdatepicker" data-target-input="nearest">
-                                        <input type="text" class="form-control datetimepicker-input" data-target="#birthdatepicker" name="birthdate" id="birthdate" required>
+                                        <input type="text" class="form-control datetimepicker-input" data-target="#birthdatepicker" name="birth_date" id="birth_date" required>
                                         <div class="input-group-append" data-target="#birthdatepicker" data-toggle="datetimepicker">
                                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select name="gender_id" id="gender_id" class="form-control select2" style="width: 100%;" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="1">Male</option>
+                                        <option value="2">Female</option>
+                                    </select>
+                                    <div class="valid-feedback">Looks Good!</div>
+                                    <div class="invalid-feedback">Please select Gender.</div>
                                 </div>
                             </div>
                             <!-- /.card-body -->
@@ -111,13 +137,13 @@
                     //save
                     $.ajax({
                         method: "POST",
-                        url: "<?= base_url('authors'); ?>",
+                        url: "<?= base_url('profiles'); ?>",
                         data: jsondata,
                         success: function(result, textStatus, jqXHR) {
                             $(document).Toasts("create", {
                                 class: "bg-success",
                                 title: "Success",
-                                body: "Record Created Successfuly.",
+                                body: "Profile created successfuly.",
                                 autohide: true,
                                 delay: 3000
                             })
@@ -140,13 +166,13 @@
                     //update
                     $.ajax({
                         method: "PUT",
-                        url: "<?= base_url() ?>authors/" + formdata.id,
+                        url: "<?= base_url() ?>profiles/" + formdata.id,
                         data: jsondata,
                         success: function(result, textStatus, jqXHR) {
                             $(document).Toasts("create", {
                                 class: "bg-success",
                                 title: "Success",
-                                body: "Record Updated Successfuly.",
+                                body: "Record updated successfuly.",
                                 autohide: true,
                                 delay: 3000
                             })
@@ -158,7 +184,7 @@
                             $(document).Toasts("create", {
                                 class: "bg-danger",
                                 title: "Error",
-                                body: "Record Was Not Updated.",
+                                body: "Record was not updated.",
                                 autohide: true,
                                 delay: 3000
                             })
@@ -177,11 +203,16 @@
         processing: true,
         serverSide: true,
         ajax: {
-            url: "<?= base_url('authors/list'); ?>",
-            type: "POST"
+            url: "<?= base_url('profiles/list'); ?>",
+            type: "GET"
         },
         columns: [{
-                data: "id",
+                data: "profile_id",
+                visible: false,
+                searchable: false,
+            },
+            {
+                data: "user_name",
             },
             {
                 data: "last_name",
@@ -190,16 +221,21 @@
                 data: "first_name",
             },
             {
+                data: "middle_name",
+            },
+            {
                 data: "email",
             },
             {
-                data: "birthdate",
+                data: "birth_date",
+            },
+            {
+                data: "gender",
             },
             {
                 data: null,
                 defaultContent: `<td>
                 <button class="btn btn-primary" id="editRow"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger" id="deleteRow"><i class="fas fa-trash"></i></button>
                 </td>`,
             }
         ],
@@ -214,17 +250,19 @@
 
     $(document).on("click", "#editRow", function() {
         let row = $(this).parents("tr")[0];
-        let id = table.row(row).data().id;
+        let id = table.row(row).data().profile_id;
         $.ajax({
             method: "GET",
-            url: "<?= base_url() ?>authors/" + id,
+            url: "<?= base_url() ?>profiles/" + id,
             success: function(result, textStatus, jqXHR) {
                 $("#modalID").modal("show");
-                $("#id").val(result.id);
+                $("#id").val(result.profile_id);
+                $("#user_id").val(result.user_id).trigger("change").prop('readonly',true);
                 $("#last_name").val(result.last_name);
+                $("#middle_name").val(result.middle_name);
                 $("#first_name").val(result.first_name);
-                $("#email").val(result.email);
-                $("#birthdate").val(result.birthdate);
+                $("#birth_date").val(result.birth_date);
+                $("#gender_id").val(result.gender_id).trigger("change");
             },
             error: function(result, textStatus, jqXHR) {
                 $(document).Toasts("create", {
@@ -238,42 +276,44 @@
         })
     });
 
-    $(document).on("click", "#deleteRow", function() {
-        let row = $(this).parents("tr")[0];
-        let id = table.row(row).data().id;
-        if (confirm("Are you sure you want to delete this record?")) {
-            $.ajax({
-                method: "DELETE",
-                url: "<?= base_url() ?>authors/" + id,
-                success: function(result, textStatus, jqXHR) {
-                    $(document).Toasts("create", {
-                        class: "bg-success",
-                        title: "Deleted",
-                        body: "Record Was Deleted.",
-                        autohide: true,
-                        delay: 3000
-                    });
-                    table.ajax.reload();
-                },
-                error: function(result, textStatus, jqXHR) {
-                    $(document).Toasts("create", {
-                        class: "bg-danger",
-                        title: "Error",
-                        body: "Record Was Not Found.",
-                        autohide: true,
-                        delay: 3000
-                    });
-                }
-            });
-        }
+    // $(document).on("click", "#deleteRow", function() {
+    //     let row = $(this).parents("tr")[0];
+    //     let id = table.row(row).data().profile_id;
+    //     if (confirm("Are you sure you want to delete this record?")) {
+    //         $.ajax({
+    //             method: "DELETE",
+    //             url: "<?= base_url() ?>profiles/" + id,
+    //             success: function(result, textStatus, jqXHR) {
+    //                 $(document).Toasts("create", {
+    //                     class: "bg-success",
+    //                     title: "Deleted",
+    //                     body: "Record Was Deleted.",
+    //                     autohide: true,
+    //                     delay: 3000
+    //                 });
+    //                 table.ajax.reload();
+    //             },
+    //             error: function(result, textStatus, jqXHR) {
+    //                 $(document).Toasts("create", {
+    //                     class: "bg-danger",
+    //                     title: "Error",
+    //                     body: "Record Was Not Found.",
+    //                     autohide: true,
+    //                     delay: 3000
+    //                 });
+    //             }
+    //         });
+    //     }
 
-    });
+    // });
 
     function clearform() {
         $("#id").val("");
+        $("#user_id").val("").trigger("change");
         $("#last_name").val("");
+        $("#middle_name").val("");
         $("#first_name").val("");
-        $("#email").val("");
+        $("#gender_id").val("").trigger("change");
         $("#birthdate").val("");
     }
 
