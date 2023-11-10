@@ -5,7 +5,7 @@
     <div class="container-fulid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">Author Management</h1>
+                <h1 class="m-0">List of Tickets</h1>
             </div>
         </div>
     </div>
@@ -15,64 +15,73 @@
     <div class="container-fulid">
         <div class="row mb-2">
             <div class="col-sm-12">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalID">
-                    Add Author
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalTicket">
+                   Create Response
                 </button>
             </div>
         </div>
-        <table id="dataTable" class="table table-bordered table-striped">
+        <table id="dataTableTicket" class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>LAST NAME</th>
-                    <th>FIRST NAME</th>
-                    <th>EMAIL</th>
-                    <th>BIRTH DATE</th>
-                    <th>ACTION</th>
+                    <th hidden>ID</th>
+                    <th hidden>Ticket ID</th>
+                    <th>Ticket #</th>
+                    <!-- <th>Requested By</th> -->
+                    <!-- <th>Email</th> -->
+                    <!-- <th hidden>Severity ID</th>
+                    <th>Severity</th> -->
+                    <th>Acted By</th>
+                    <th hidden>Status ID</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                    <th class="text-center">ACTION</th>
                 </tr>
             </thead>
         </table>
 
-        <div class="modal fade" id="modalID" tabindex="-1" role="dialog">
+        <div class="modal fade" id="modalTicket" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content" id="modalContent">
                     <div class="modal-header">
-                        <h5 class="modal-title">Author Details</h5>
+                        <h5 class="modal-title">Request Ticket Details</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeModal">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
 
                     <div class="modal-body">
-                        <form class="needs-validation" novalidate>
+                        <form class="needs-validation" id="frmTicket" novalidate>
                             <div class="card-body">
-                                <input type="hidden" name="id" id="id">
+                                <input type="hidden" name="t_id" id="t_id">
                                 <div class="form-group">
-                                    <label for="first_name">First Name</label>
-                                    <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name" required>
+                                    <label>Office</label>
+                                    <select name="support_ticket_id" id="support_ticket_id" class="form-control select2" style="width: 100%;" required>
+                                        <option value="">Select Ticket</option>
+                                        <?php foreach($tickets as $t) {
+                                            echo "<option value='".$t['support_ticket_id']."'>".$t['ticket_num']."</option>";
+                                        }
+                                        ?>
+                                    </select>
                                     <div class="valid-feedback">Looks Good!</div>
-                                    <div class="invalid-feedback">Please provide a valid First Name.</div>
+                                    <div class="invalid-feedback">Please select Ticket.</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="last_name">Last Name</label>
-                                    <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name" required>
+                                    <label>Severity</label>
+                                    <select name="ticket_status_id" id="ticket_status_id" class="form-control select2" style="width: 100%;" required>
+                                        <option value="">Select Status</option>
+                                        <?php foreach($statuses as $st) {
+                                            echo "<option value='".$st['ticket_status_id']."'>".$st['ticket_status']."</option>";
+                                        }
+                                        ?>
+                                    </select>
                                     <div class="valid-feedback">Looks Good!</div>
-                                    <div class="invalid-feedback">Please provide a valid Last Name.</div>
+                                    <div class="invalid-feedback">Please select Status.</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="email">Email</label>
-                                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter Last Name" required>
+                                    <label for="description">Remarks</label>
+                                    <textarea class="form-control" rows="3" name="remarks" id="remarks" placeholder="Enter Remarks" required></textarea>
                                     <div class="valid-feedback">Looks Good!</div>
-                                    <div class="invalid-feedback">Please provide a valid Email Name.</div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="birthdate">Birth Date</label>
-                                    <div class="input-group date" id="birthdatepicker" data-target-input="nearest">
-                                        <input type="text" class="form-control datetimepicker-input" data-target="#birthdatepicker" name="birthdate" id="birthdate" required>
-                                        <div class="input-group-append" data-target="#birthdatepicker" data-toggle="datetimepicker">
-                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                        </div>
-                                    </div>
+                                    <div class="invalid-feedback">Please input Remarks.</div>
                                 </div>
                             </div>
                             <!-- /.card-body -->
@@ -93,11 +102,7 @@
 <?= $this->section('pagescripts'); ?>
 <script>
     $(function() {
-        $('#birthdatepicker').datetimepicker({
-            format: 'YYYY-MM-DD'
-        });
-
-        $("form").submit(function(event) {
+        $("#frmTicket").submit(function(event) {
             event.preventDefault();
             let formdata = $(this).serializeArray().reduce(function(obj, item) {
                 obj[item.name] = item.value;
@@ -107,29 +112,31 @@
             let jsondata = JSON.stringify(formdata);
 
             if (this.checkValidity()) {
-                if (!formdata.id) {
+                if (!formdata.t_id) {
                     //save
                     $.ajax({
                         method: "POST",
-                        url: "<?= base_url('authors'); ?>",
+                        url: "<?= base_url('response'); ?>",
                         data: jsondata,
                         success: function(result, textStatus, jqXHR) {
+                            console.log(result);
                             $(document).Toasts("create", {
                                 class: "bg-success",
                                 title: "Success",
-                                body: "Record Created Successfuly.",
+                                body: "Response created successfuly.",
                                 autohide: true,
                                 delay: 3000
                             })
                             table.ajax.reload();
                             clearform();
-                            $("#modalID").modal("hide");
+                            $("#modalTicket").modal("hide");
                         },
                         error: function(result, textStatus, jqXHR) {
+                            console.log(result);
                             $(document).Toasts("create", {
                                 class: "bg-danger",
                                 title: "Error",
-                                body: "Record Was Not Created.",
+                                body: "Failed to create the record.",
                                 autohide: true,
                                 delay: 3000
                             })
@@ -140,25 +147,25 @@
                     //update
                     $.ajax({
                         method: "PUT",
-                        url: "<?= base_url() ?>authors/" + formdata.id,
+                        url: "<?= base_url() ?>response/" + formdata.t_id,
                         data: jsondata,
                         success: function(result, textStatus, jqXHR) {
                             $(document).Toasts("create", {
                                 class: "bg-success",
                                 title: "Success",
-                                body: "Record Updated Successfuly.",
+                                body: "Response updated successfuly.",
                                 autohide: true,
                                 delay: 3000
                             })
                             table.ajax.reload();
                             clearform();
-                            $("#modalID").modal("hide");
+                            $("#modalTicket").modal("hide");
                         },
                         error: function(result, textStatus, jqXHR) {
                             $(document).Toasts("create", {
                                 class: "bg-danger",
                                 title: "Error",
-                                body: "Record Was Not Updated.",
+                                body: "Failed to update the record.",
                                 autohide: true,
                                 delay: 3000
                             })
@@ -172,35 +179,45 @@
         });
     });
 
-    var table = $("#dataTable").DataTable({
+    var table = $("#dataTableTicket").DataTable({
         responsive: true,
         processing: true,
         serverSide: true,
         ajax: {
-            url: "<?= base_url('authors/list'); ?>",
-            type: "POST"
+            url: "<?= base_url('response/list'); ?>",
+            type: "GET"
         },
         columns: [{
-                data: "id",
+                data: "support_ticket_response_id",
+                visible: false,
+                searchable: false,
             },
             {
-                data: "last_name",
+                data: "support_ticket_id",
+                visible: false,
+                searchable: false,
             },
             {
-                data: "first_name",
+                data: "ticket_num",
             },
             {
-                data: "email",
+                data: "acted_by",
             },
             {
-                data: "birthdate",
+                data: "ticket_status_id",
+                visible: false,
+                searchable: false,
+            },
+            {
+                data: "status",
+            },
+            {
+                data: "remarks",
             },
             {
                 data: null,
-                defaultContent: `<td>
-                <button class="btn btn-primary" id="editRow"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger" id="deleteRow"><i class="fas fa-trash"></i></button>
-                </td>`,
+                "className": "text-center",
+                defaultContent: '<td class="text-center"><button class="btn btn-primary" id="editRow"><i class="fas fa-edit"></i></button>&nbsp;<button class="btn btn-danger" id="deleteRow"><i class="fas fa-trash"></i></button></td>',
             }
         ],
         paging: true,
@@ -214,55 +231,62 @@
 
     $(document).on("click", "#editRow", function() {
         let row = $(this).parents("tr")[0];
-        let id = table.row(row).data().id;
+        let id = table.row(row).data().support_ticket_response_id;
         $.ajax({
             method: "GET",
-            url: "<?= base_url() ?>authors/" + id,
+            url: "<?= base_url() ?>response/" + id,
             success: function(result, textStatus, jqXHR) {
-                $("#modalID").modal("show");
-                $("#id").val(result.id);
-                $("#last_name").val(result.last_name);
-                $("#first_name").val(result.first_name);
-                $("#email").val(result.email);
-                $("#birthdate").val(result.birthdate);
+                //console.log(result);
+                $("#modalTicket").modal("show");
+                $("#t_id").val(result.support_ticket_response_id);
+                //$("#office_id").val(result.office_id);
+                //$('#office_id option:first').prop('selected',true);
+                //$("#support_condition_id").val(result.support_condition_id);
+                //$("#support_condition_id option:first").prop('selected',true);
+                $("#support_ticket_id").val(result.support_ticket_id).trigger("change");
+                $("#ticket_status_id").val(result.ticket_status_id).trigger("change");
+                $("#remarks").text(result.remarks);
             },
             error: function(result, textStatus, jqXHR) {
                 $(document).Toasts("create", {
                     class: "bg-danger",
                     title: "Error",
-                    body: "Record Was Not Found.",
+                    //body: "Record was not found.",
+                    body: result.responseJSON.messages,
                     autohide: true,
                     delay: 3000
-                });
+                })
             }
         })
     });
 
     $(document).on("click", "#deleteRow", function() {
         let row = $(this).parents("tr")[0];
-        let id = table.row(row).data().id;
+        let id = table.row(row).data().support_ticket_response_id;
         if (confirm("Are you sure you want to delete this record?")) {
             $.ajax({
                 method: "DELETE",
-                url: "<?= base_url() ?>authors/" + id,
+                url: "<?= base_url() ?>response/" + id,
                 success: function(result, textStatus, jqXHR) {
                     $(document).Toasts("create", {
                         class: "bg-success",
                         title: "Deleted",
-                        body: "Record Was Deleted.",
+                        body: "Record was deleted successfully.",
+                        //body: result.responseJSON.messages,
                         autohide: true,
                         delay: 3000
-                    });
+                    })
+                    clearform();
                     table.ajax.reload();
                 },
                 error: function(result, textStatus, jqXHR) {
                     $(document).Toasts("create", {
                         class: "bg-danger",
                         title: "Error",
-                        body: "Record Was Not Found.",
+                        body: result.responseJSON.messages,
                         autohide: true,
                         delay: 3000
-                    });
+                    })
                 }
             });
         }
@@ -270,11 +294,10 @@
     });
 
     function clearform() {
-        $("#id").val("");
-        $("#last_name").val("");
-        $("#first_name").val("");
-        $("#email").val("");
-        $("#birthdate").val("");
+        $("#t_id").val("");
+        $("#support_ticket_id").val("").trigger("change");
+        $("#ticket_status_id").val("").trigger("change");
+        $("#remarks").text("");
     }
 
     $(document).ready(function() {

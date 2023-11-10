@@ -110,7 +110,7 @@
                             </a>
                         </li> -->
                         <li class="nav-item">
-                            <a href="<?= base_url() ?>tickets" class="nav-link">
+                            <a href="<?= base_url() ?>ticket" class="nav-link">
                                 <i class="nav-icon fas fa-chalkboard-teacher"></i>
                                 <p>
                                     Tickets
@@ -118,7 +118,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url() ?>responses" class="nav-link">
+                            <a href="<?= base_url() ?>response" class="nav-link">
                                 <i class="nav-icon fas fa-tasks"></i>
                                 <p>
                                     Responses

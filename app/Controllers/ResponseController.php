@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\Office;
 use App\Models\SupportCondition;
+use App\Models\SupportTicket;
 use App\Models\SupportTicketResponse;
 use App\Models\TicketStatus;
 use App\Models\Users;
@@ -20,10 +21,11 @@ class ResponseController extends BaseController
         //return $this->response->setStatusCode(Response::HTTP_OK)->setJSON();
         $status = new TicketStatus();
         //whereNotIn(?string $key = null, $values = null, ?bool $escape = null)
-        $statuses = $status->select('ticket_status_id,ticket_status')->whereNotIn('ticket_status_id',1)->findAll();
+        $statuses = $status->select('ticket_status_id,ticket_status')->whereIn('ticket_status_id',[2,3])->findAll();
+        $ticket_model = new SupportTicket();
+        $tickets = $ticket_model->select('support_ticket_id,ticket_num')->whereIn('ticket_status_id',[1,2])->findAll();
 
-        print_r($statuses);
-        return view('responses/index',['statuses'=>$statuses]);
+        return view('responses/index',['statuses'=>$statuses,'tickets'=>$tickets]);
     }
 
     public function show($id = null)
@@ -76,7 +78,7 @@ class ResponseController extends BaseController
         $data = array();
 
         foreach ($records as $record) {
-            $user_id = auth()->user()->id;
+            $user_id = $record['acted_by'];
             $user_model = new Users();
             $status = new TicketStatus();
             // $condition = new SupportCondition();
@@ -85,9 +87,12 @@ class ResponseController extends BaseController
             // $of = $office->select('office_name')->where('office_id', $record['office_id'])->findAll();
             // $con = $condition->select('condition')->where('support_condition_id', $record['support_condition_id'])->findAll();
             $stat = $status->select('ticket_status')->where('ticket_status_id', $record['ticket_status_id'])->findAll();
+            $ticket = new SupportTicket();
+            $tickets = $ticket->select('*')->where('support_ticket_id', $record['support_ticket_id'])->findAll();
             $data[] = array(
+                "support_ticket_response_id" => $record['support_ticket_response_id'],
                 "support_ticket_id" => $record['support_ticket_id'],
-                //"ticket_num" => $record['ticket_num'],
+                "ticket_num" => $tickets[0]['ticket_num'],
                 "acted_by" => $prof[0]['username'],
                 //"email" => $prof[0]['secret'],
                 //"office_id" => $record['office_id'],

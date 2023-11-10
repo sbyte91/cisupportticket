@@ -13,14 +13,15 @@ $routes->setTranslateURIDashes(false);
 $routes->set404Override();
 
 $routes->get('dashboard', 'DashboardController::index',['filter' => 'auth']);
-$routes->get('tickets', 'TicketController::index',['filter' => 'auth']);
-$routes->get('responses', 'ResponseController::index',['filter' => 'auth']);
+//$routes->get('tickets', 'TicketController::index',['filter' => 'auth']);
+//$routes->get('responses', 'ResponseController::index',['filter' => 'auth']);
 
 $routes->post('authors/list', 'AuthorController::list', ['filter' => 'groupfilter:admin']);
 $routes->get('office/list', 'OfficeController::list', ['filter' => 'groupfilter:admin']);
 $routes->get('status/list', 'StatusController::list', ['filter' => 'groupfilter:admin']);
 $routes->get('condition/list', 'ConditionController::list', ['filter' => 'groupfilter:admin']);
 $routes->get('ticket/list', 'TicketController::list', ['filter' => 'auth']);
+$routes->get('response/list', 'ResponseController::list', ['filter' => 'auth']);
 //$routes->post('posts/list', 'PostController::list');
 
 
@@ -32,6 +33,7 @@ $routes->resource('condition', ['controller' => 'ConditionController','filter' =
 $routes->resource('status', ['controller' => 'StatusController','filter' => 'groupfilter:admin']);
 $routes->resource('office', ['controller' => 'OfficeController','filter' => 'groupfilter:admin']);
 $routes->resource('ticket', ['controller' => 'TicketController','filter' => 'auth']);
+$routes->resource('response', ['controller' => 'ResponseController','filter' => 'auth']);
 
 
 service('auth')->routes($routes);
